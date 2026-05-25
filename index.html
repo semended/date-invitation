@@ -558,29 +558,56 @@
     const statusText = document.querySelector(".status");
     let noClicks = 0;
 
+    function randomBetween(min, max) {
+      if (max <= min) {
+        return min;
+      }
+
+      return min + Math.random() * (max - min);
+    }
+
+    function makeNoButtonRoam() {
+      if (noButton.dataset.roaming === "true") {
+        return;
+      }
+
+      const buttonWidth = noButton.offsetWidth;
+      const buttonHeight = noButton.offsetHeight;
+      noButton.dataset.roaming = "true";
+      noButton.style.width = `${Math.max(118, Math.min(168, buttonWidth))}px`;
+      noButton.style.height = `${buttonHeight}px`;
+      noButton.style.zIndex = "8";
+      document.body.appendChild(noButton);
+    }
+
     function placeNoButton() {
-      const buttonBox = noButton.getBoundingClientRect();
-      const margin = 22;
-      const maxX = Math.max(margin, window.innerWidth - buttonBox.width - margin);
-      const maxY = Math.max(margin, window.innerHeight - buttonBox.height - margin);
-      const x = margin + Math.random() * (maxX - margin);
-      const y = margin + Math.random() * (maxY - margin);
+      makeNoButtonRoam();
+      const scale = Number.parseFloat(getComputedStyle(noButton).getPropertyValue("--no-scale")) || 1;
+      const edge = Math.max(26, Math.min(54, window.innerWidth * 0.05));
+      const safeWidth = noButton.offsetWidth * scale + 42;
+      const safeHeight = noButton.offsetHeight * scale + 42;
+      const minX = Math.min(window.innerWidth / 2, safeWidth / 2 + edge);
+      const maxX = Math.max(window.innerWidth / 2, window.innerWidth - safeWidth / 2 - edge);
+      const minY = Math.min(window.innerHeight / 2, safeHeight / 2 + edge);
+      const maxY = Math.max(window.innerHeight / 2, window.innerHeight - safeHeight / 2 - edge);
+      const x = randomBetween(minX, maxX);
+      const y = randomBetween(minY, maxY);
 
       noButton.style.position = "fixed";
       noButton.style.left = `${x}px`;
       noButton.style.top = `${y}px`;
-      noButton.style.transform = `scale(var(--no-scale)) rotate(${Math.random() * 18 - 9}deg)`;
+      noButton.style.transform = `translate(-50%, -50%) scale(var(--no-scale)) rotate(${Math.random() * 14 - 7}deg)`;
     }
 
     function rejectNo() {
       noClicks += 1;
-      const scale = Math.max(0.38, 1 - noClicks * 0.18);
+      const scale = Math.max(0.78, 0.94 - (noClicks - 1) * 0.04);
       noButton.style.setProperty("--no-scale", scale);
-      noButton.classList.toggle("is-tiny", noClicks > 1);
-      noButton.textContent = noClicks > 2 ? "нет" : "Нет";
+      noButton.classList.toggle("is-tiny", noClicks > 2);
+      noButton.textContent = "Нет";
       statusText.textContent = noClicks === 1
-        ? "кнопка “нет” начала терять уверенность"
-        : "она все меньше и все менее убедительна";
+        ? "кнопка “нет” осторожно отступает"
+        : "она все еще противится, но без шансов";
       placeNoButton();
     }
 
