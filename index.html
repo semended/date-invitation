@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Свидание?</title>
+  <style>
+    :root {
+      --ink: #28161e;
+      --muted: #735e67;
+      --cream: #fff8ef;
+      --paper: #fffdf8;
+      --cherry: #e83f6f;
+      --cherry-deep: #b71e49;
+      --blue: #2354d1;
+      --green: #4f9f7a;
+      --gold: #f2bd3d;
+      --line: rgba(40, 22, 30, 0.14);
+      --shadow: 0 30px 90px rgba(40, 22, 30, 0.2);
+      --no-scale: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      overflow-x: hidden;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+      background:
+        radial-gradient(circle at 13% 18%, rgba(232, 63, 111, 0.22) 0 12%, transparent 13%),
+        radial-gradient(circle at 86% 12%, rgba(35, 84, 209, 0.18) 0 11%, transparent 12%),
+        radial-gradient(circle at 78% 86%, rgba(79, 159, 122, 0.22) 0 14%, transparent 15%),
+        linear-gradient(135deg, #fff7ed 0%, #fffdf9 48%, #f3f8ff 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.32;
+      background-image:
+        linear-gradient(90deg, rgba(40, 22, 30, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(40, 22, 30, 0.06) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(black, transparent 82%);
+    }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 540px);
+      gap: clamp(28px, 6vw, 88px);
+      align-items: center;
+      width: min(1180px, calc(100vw - 44px));
+      margin: 0 auto;
+      padding: clamp(26px, 5vh, 64px) 0;
+    }
+
+    .copy {
+      position: relative;
+      z-index: 2;
+      max-width: 590px;
+    }
+
+    .eyebrow {
+      display: inline-grid;
+      grid-auto-flow: column;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 20px;
+      color: var(--cherry-deep);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      background: var(--cherry);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 10ch;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(54px, 8.2vw, 112px);
+      line-height: 0.88;
+      letter-spacing: 0;
+    }
+
+    .copy p {
+      max-width: 42ch;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(18px, 1.8vw, 22px);
+      line-height: 1.48;
+    }
+
+    .tiny-note {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 32px;
+      padding: 10px 13px;
+      border: 1px solid rgba(40, 22, 30, 0.12);
+      border-radius: 999px;
+      color: #5d4d55;
+      background: rgba(255, 253, 248, 0.68);
+      box-shadow: 0 12px 32px rgba(40, 22, 30, 0.08);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .scene {
+      position: relative;
+      min-height: 680px;
+      display: grid;
+      place-items: center;
+    }
+
+    .stamp {
+      position: absolute;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 126px;
+      aspect-ratio: 1;
+      border: 2px solid rgba(40, 22, 30, 0.12);
+      border-radius: 50%;
+      color: var(--blue);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 54px;
+      font-weight: 900;
+      background: rgba(255, 253, 248, 0.7);
+      box-shadow: 0 18px 45px rgba(35, 84, 209, 0.13);
+      transform: rotate(13deg);
+    }
+
+    .stamp.left {
+      left: -12px;
+      top: 104px;
+    }
+
+    .stamp.right {
+      right: -28px;
+      bottom: 90px;
+      color: var(--green);
+      transform: rotate(-10deg);
+    }
+
+    .invitation {
+      position: relative;
+      z-index: 3;
+      width: min(100%, 455px);
+      min-height: 590px;
+      padding: clamp(24px, 4vw, 36px);
+      border: 1px solid rgba(40, 22, 30, 0.16);
+      border-radius: 8px;
+      background:
+        linear-gradient(rgba(255, 253, 248, 0.92), rgba(255, 253, 248, 0.92)),
+        repeating-linear-gradient(0deg, transparent 0 35px, rgba(232, 63, 111, 0.08) 36px);
+      box-shadow: var(--shadow);
+      transform: rotate(-1.4deg);
+    }
+
+    .invitation::before,
+    .invitation::after {
+      content: "";
+      position: absolute;
+      width: 118px;
+      height: 34px;
+      border: 1px solid rgba(40, 22, 30, 0.1);
+      background: rgba(242, 189, 61, 0.54);
+      box-shadow: 0 10px 24px rgba(40, 22, 30, 0.12);
+    }
+
+    .invitation::before {
+      left: 28px;
+      top: -16px;
+      transform: rotate(-9deg);
+    }
+
+    .invitation::after {
+      right: 22px;
+      bottom: -17px;
+      background: rgba(35, 84, 209, 0.17);
+      transform: rotate(8deg);
+    }
+
+    .portrait {
+      width: 128px;
+      aspect-ratio: 1;
+      margin: 0 auto 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.95) 0 9%, transparent 10%),
+        radial-gradient(circle at 68% 20%, rgba(255, 255, 255, 0.75) 0 7%, transparent 8%),
+        linear-gradient(145deg, #f5c9d5 0%, #f7dd9a 100%);
+      box-shadow: inset 0 -18px 36px rgba(40, 22, 30, 0.11), 0 18px 38px rgba(40, 22, 30, 0.16);
+    }
+
+    .envelope {
+      position: relative;
+      width: 76px;
+      height: 52px;
+      border: 3px solid var(--ink);
+      border-radius: 7px;
+      background: #fffdf8;
+      transform: rotate(-8deg);
+    }
+
+    .envelope::before,
+    .envelope::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(32deg, transparent 48%, var(--ink) 50%, transparent 52%),
+        linear-gradient(-32deg, transparent 48%, var(--ink) 50%, transparent 52%);
+    }
+
+    .heart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      background: var(--cherry);
+      transform: translate(-50%, -36%) rotate(45deg);
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--cherry);
+    }
+
+    .heart::before {
+      left: -10px;
+    }
+
+    .heart::after {
+      top: -10px;
+    }
+
+    .question {
+      margin: 0 auto;
+      max-width: 12ch;
+      text-align: center;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(38px, 5vw, 58px);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .subtext {
+      max-width: 30ch;
+      margin: 18px auto 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .actions {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 14px;
+      min-height: 116px;
+      margin-top: 36px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      height: 58px;
+      border-radius: 999px;
+      font: 900 16px/1 "Trebuchet MS", "Verdana", sans-serif;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, opacity 180ms ease;
+      touch-action: manipulation;
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(232, 63, 111, 0.34);
+      outline-offset: 4px;
+    }
+
+    .yes {
+      color: white;
+      background: linear-gradient(135deg, var(--cherry), var(--cherry-deep));
+      box-shadow: 0 16px 30px rgba(232, 63, 111, 0.28);
+    }
+
+    .yes:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(232, 63, 111, 0.34);
+    }
+
+    .no {
+      position: relative;
+      z-index: 4;
+      color: var(--ink);
+      border: 1px solid rgba(40, 22, 30, 0.15);
+      background: white;
+      box-shadow: 0 14px 28px rgba(40, 22, 30, 0.1);
+      transform: scale(var(--no-scale));
+      transform-origin: center;
+    }
+
+    .no.is-tiny {
+      opacity: 0.72;
+    }
+
+    .status {
+      position: absolute;
+      left: 36px;
+      right: 36px;
+      bottom: 28px;
+      margin: 0;
+      color: rgba(40, 22, 30, 0.46);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .answer {
+      position: fixed;
+      z-index: 10;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.04);
+      transition: opacity 260ms ease, transform 260ms ease;
+      background: rgba(255, 248, 239, 0.82);
+      backdrop-filter: blur(18px);
+    }
+
+    .answer.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    .answer-box {
+      width: min(92vw, 560px);
+      padding: clamp(30px, 6vw, 54px);
+      text-align: center;
+      border: 1px solid rgba(40, 22, 30, 0.16);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .answer-box h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(42px, 8vw, 82px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .answer-box p {
+      max-width: 34ch;
+      margin: 18px auto 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.48;
+    }
+
+    .confetti {
+      position: fixed;
+      top: -20px;
+      width: 9px;
+      height: 18px;
+      border-radius: 2px;
+      opacity: 0;
+      animation: fall 1.75s linear forwards;
+    }
+
+    @keyframes fall {
+      0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(110vh) rotate(560deg);
+      }
+    }
+
+    @media (max-width: 860px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      .page {
+        grid-template-columns: 1fr;
+        width: min(100vw - 28px, 540px);
+        gap: 26px;
+        padding: 28px 0 34px;
+      }
+
+      .copy {
+        text-align: center;
+        justify-self: center;
+      }
+
+      .eyebrow {
+        margin-bottom: 14px;
+      }
+
+      .eyebrow::before {
+        display: none;
+      }
+
+      h1 {
+        max-width: none;
+        font-size: clamp(46px, 15vw, 70px);
+      }
+
+      .copy p {
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 17px;
+      }
+
+      .tiny-note {
+        margin-top: 18px;
+      }
+
+      .scene {
+        min-height: 0;
+      }
+
+      .stamp {
+        display: none;
+      }
+
+      .invitation {
+        min-height: 0;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .page {
+        width: calc(100vw - 20px);
+      }
+
+      .invitation {
+        padding: 22px 18px 54px;
+      }
+
+      .portrait {
+        width: 96px;
+        margin-bottom: 20px;
+      }
+
+      .question {
+        font-size: 35px;
+      }
+
+      .subtext {
+        margin-top: 14px;
+        font-size: 15px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr 0.82fr;
+        gap: 10px;
+        min-height: 64px;
+        margin-top: 22px;
+      }
+
+      button {
+        height: 54px;
+      }
+
+      .status {
+        bottom: 20px;
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="copy" aria-label="Вступление">
+      <p class="eyebrow">очень важный опрос</p>
+      <h1>Есть один вопрос.</h1>
+      <p>Я мог просто написать в чат, но почему-то решил сделать сайт. В общем, давай красиво.</p>
+      <span class="tiny-note">ответ “нет” технически предусмотрен, но морально осуждается</span>
+    </section>
+
+    <section class="scene" aria-label="Приглашение">
+      <div class="stamp left" aria-hidden="true">да</div>
+      <div class="stamp right" aria-hidden="true">да</div>
+
+      <article class="invitation">
+        <div class="portrait" aria-hidden="true">
+          <div class="envelope">
+            <div class="heart"></div>
+          </div>
+        </div>
+
+        <h2 class="question">Пойдёшь со мной на свидание?</h2>
+        <p class="subtext">Обещаю выбрать место получше, чем это сообщение вместо нормального сообщения.</p>
+
+        <div class="actions">
+          <button class="yes" type="button">Да, конечно</button>
+          <button class="no" type="button">Нет</button>
+        </div>
+
+        <p class="status">ожидание самого правильного ответа</p>
+      </article>
+    </section>
+  </main>
+
+  <aside class="answer" aria-hidden="true">
+    <div class="answer-box">
+      <h2>Ура. Тогда это свидание.</h2>
+      <p>Дальше я беру на себя место, время и попытку не выглядеть слишком довольным.</p>
+    </div>
+  </aside>
+
+  <script>
+    const noButton = document.querySelector(".no");
+    const yesButton = document.querySelector(".yes");
+    const answer = document.querySelector(".answer");
+    const statusText = document.querySelector(".status");
+    let noClicks = 0;
+
+    function placeNoButton() {
+      const buttonBox = noButton.getBoundingClientRect();
+      const margin = 22;
+      const maxX = Math.max(margin, window.innerWidth - buttonBox.width - margin);
+      const maxY = Math.max(margin, window.innerHeight - buttonBox.height - margin);
+      const x = margin + Math.random() * (maxX - margin);
+      const y = margin + Math.random() * (maxY - margin);
+
+      noButton.style.position = "fixed";
+      noButton.style.left = `${x}px`;
+      noButton.style.top = `${y}px`;
+      noButton.style.transform = `scale(var(--no-scale)) rotate(${Math.random() * 18 - 9}deg)`;
+    }
+
+    function rejectNo() {
+      noClicks += 1;
+      const scale = Math.max(0.38, 1 - noClicks * 0.18);
+      noButton.style.setProperty("--no-scale", scale);
+      noButton.classList.toggle("is-tiny", noClicks > 1);
+      noButton.textContent = noClicks > 2 ? "нет" : "Нет";
+      statusText.textContent = noClicks === 1
+        ? "кнопка “нет” начала терять уверенность"
+        : "она все меньше и все менее убедительна";
+      placeNoButton();
+    }
+
+    function dodgeNo() {
+      if (noClicks > 0) {
+        placeNoButton();
+      }
+    }
+
+    function celebrate() {
+      answer.classList.add("is-visible");
+      answer.setAttribute("aria-hidden", "false");
+
+      const colors = ["#e83f6f", "#2354d1", "#4f9f7a", "#f2bd3d", "#28161e"];
+      for (let i = 0; i < 110; i += 1) {
+        const piece = document.createElement("i");
+        piece.className = "confetti";
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDelay = `${Math.random() * 0.42}s`;
+        piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 2400);
+      }
+    }
+
+    noButton.addEventListener("click", rejectNo);
+    noButton.addEventListener("pointerenter", dodgeNo);
+    noButton.addEventListener("focus", dodgeNo);
+    yesButton.addEventListener("click", celebrate);
+  </script>
+</body>
+</html>
